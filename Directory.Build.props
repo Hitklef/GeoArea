@@ -1,0 +1,10 @@
+<Project>
+  <!-- Спільні налаштування для всіх проєктів рішення -->
+  <PropertyGroup>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <Authors>Dressler Consulting</Authors>
+    <Copyright>© 2026 Dressler Consulting</Copyright>
+  </PropertyGroup>
+</Project>

@@ -1,1 +1,13 @@
-<Solution />
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/GeoArea.Core/GeoArea.Core.csproj" />
+    <Project Path="src/GeoArea.App/GeoArea.App.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/GeoArea.Core.Tests/GeoArea.Core.Tests.csproj" />
+  </Folder>
+  <Folder Name="/docs/">
+    <File Path="README.md" />
+    <File Path="docs/plan.md" />
+  </Folder>
+</Solution>

@@ -1,0 +1,291 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Кольори -->
+    <SolidColorBrush x:Key="Brush.Window" Color="#E9ECEF" />
+    <SolidColorBrush x:Key="Brush.Card" Color="#FFFFFF" />
+    <SolidColorBrush x:Key="Brush.Border" Color="#CBD5E1" />
+    <SolidColorBrush x:Key="Brush.Text" Color="#1F2937" />
+    <SolidColorBrush x:Key="Brush.TextMuted" Color="#4B5563" />
+    <SolidColorBrush x:Key="Brush.TextHint" Color="#6B7280" />
+    <SolidColorBrush x:Key="Brush.Accent" Color="#1D4ED8" />
+    <SolidColorBrush x:Key="Brush.AccentDark" Color="#1E3A8A" />
+    <SolidColorBrush x:Key="Brush.HintBack" Color="#EFF6FF" />
+    <SolidColorBrush x:Key="Brush.HintBorder" Color="#BFDBFE" />
+    <SolidColorBrush x:Key="Brush.OkBack" Color="#F0FDF4" />
+    <SolidColorBrush x:Key="Brush.OkBorder" Color="#86EFAC" />
+    <SolidColorBrush x:Key="Brush.OkText" Color="#166534" />
+    <SolidColorBrush x:Key="Brush.OkTextDark" Color="#14532D" />
+    <SolidColorBrush x:Key="Brush.Ok" Color="#15803D" />
+    <SolidColorBrush x:Key="Brush.WarnBack" Color="#FFF7ED" />
+    <SolidColorBrush x:Key="Brush.WarnBorder" Color="#FDBA74" />
+    <SolidColorBrush x:Key="Brush.WarnText" Color="#9A3412" />
+    <SolidColorBrush x:Key="Brush.Danger" Color="#B91C1C" />
+    <SolidColorBrush x:Key="Brush.DangerBorder" Color="#FCA5A5" />
+    <SolidColorBrush x:Key="Brush.TableHeader" Color="#F1F5F9" />
+    <SolidColorBrush x:Key="Brush.TableSum" Color="#F8FAFC" />
+
+    <!-- Базовий стиль тексту. Навмисно НЕ неявний (без x:Key), бо неявний стиль TextBlock
+         перекривав би колір і розмір тексту всередині кнопок. Розмір і колір шрифту задані на вікні
+         та успадковуються. -->
+    <Style x:Key="Text.Base" TargetType="TextBlock">
+        <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+
+    <Style x:Key="Text.Title" TargetType="TextBlock" BasedOn="{StaticResource Text.Base}">
+        <Setter Property="FontSize" Value="18" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+
+    <Style x:Key="Text.Muted" TargetType="TextBlock" BasedOn="{StaticResource Text.Base}">
+        <Setter Property="Foreground" Value="{StaticResource Brush.TextMuted}" />
+        <Setter Property="LineHeight" Value="20" />
+    </Style>
+
+    <Style x:Key="Text.Hint" TargetType="TextBlock" BasedOn="{StaticResource Text.Base}">
+        <Setter Property="Foreground" Value="{StaticResource Brush.TextHint}" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="TextAlignment" Value="Center" />
+        <Setter Property="Margin" Value="0,4,0,0" />
+    </Style>
+
+    <!-- Підказки: великий шрифт, обмежена ширина -->
+    <Style TargetType="ToolTip">
+        <Setter Property="MaxWidth" Value="360" />
+        <Setter Property="Padding" Value="10,8" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="Background" Value="#FFFFFF" />
+        <Setter Property="BorderBrush" Value="{StaticResource Brush.Accent}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Foreground" Value="{StaticResource Brush.Text}" />
+        <Setter Property="ContentTemplate">
+            <Setter.Value>
+                <DataTemplate>
+                    <TextBlock Text="{Binding}" TextWrapping="Wrap" />
+                </DataTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Картка-секція -->
+    <Style x:Key="Card" TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource Brush.Card}" />
+        <Setter Property="BorderBrush" Value="{StaticResource Brush.Border}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="10" />
+        <Setter Property="Padding" Value="18" />
+    </Style>
+
+    <!-- Номер кроку в кружечку -->
+    <Style x:Key="StepBadge" TargetType="Border">
+        <Setter Property="Width" Value="30" />
+        <Setter Property="Height" Value="30" />
+        <Setter Property="CornerRadius" Value="15" />
+        <Setter Property="Background" Value="{StaticResource Brush.Accent}" />
+        <Setter Property="Margin" Value="0,0,10,0" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+    <Style x:Key="StepBadgeText" TargetType="TextBlock" BasedOn="{StaticResource Text.Base}">
+        <Setter Property="Foreground" Value="White" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="FontSize" Value="15" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+
+    <!-- Кнопки -->
+    <Style x:Key="Button.Base" TargetType="Button">
+        <Setter Property="Height" Value="44" />
+        <Setter Property="Padding" Value="14,0" />
+        <Setter Property="FontSize" Value="15" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Root"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="6"
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" RecognizesAccessKey="True" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Root" Property="Opacity" Value="0.88" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Root" Property="Opacity" Value="0.75" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="Root" Property="Opacity" Value="0.45" />
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter TargetName="Root" Property="BorderBrush" Value="{StaticResource Brush.AccentDark}" />
+                            <Setter TargetName="Root" Property="BorderThickness" Value="2" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="Button.Primary" TargetType="Button" BasedOn="{StaticResource Button.Base}">
+        <Setter Property="Background" Value="{StaticResource Brush.Accent}" />
+        <Setter Property="BorderBrush" Value="{StaticResource Brush.Accent}" />
+        <Setter Property="Foreground" Value="White" />
+    </Style>
+
+    <Style x:Key="Button.Secondary" TargetType="Button" BasedOn="{StaticResource Button.Base}">
+        <Setter Property="Background" Value="White" />
+        <Setter Property="BorderBrush" Value="{StaticResource Brush.Accent}" />
+        <Setter Property="Foreground" Value="{StaticResource Brush.Accent}" />
+    </Style>
+
+    <Style x:Key="Button.Neutral" TargetType="Button" BasedOn="{StaticResource Button.Base}">
+        <Setter Property="Background" Value="White" />
+        <Setter Property="BorderBrush" Value="{StaticResource Brush.Border}" />
+        <Setter Property="Foreground" Value="#374151" />
+    </Style>
+
+    <Style x:Key="Button.Success" TargetType="Button" BasedOn="{StaticResource Button.Base}">
+        <Setter Property="Background" Value="{StaticResource Brush.Ok}" />
+        <Setter Property="BorderBrush" Value="{StaticResource Brush.Ok}" />
+        <Setter Property="Foreground" Value="White" />
+        <Setter Property="Height" Value="40" />
+        <Setter Property="FontSize" Value="14" />
+    </Style>
+
+    <!-- Маленькі квадратні кнопки в рядку таблиці -->
+    <Style x:Key="Button.RowAction" TargetType="Button" BasedOn="{StaticResource Button.Base}">
+        <Setter Property="Width" Value="38" />
+        <Setter Property="Height" Value="38" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Margin" Value="2,0" />
+        <Setter Property="Background" Value="White" />
+        <Setter Property="BorderBrush" Value="{StaticResource Brush.Border}" />
+        <Setter Property="Foreground" Value="#374151" />
+        <Setter Property="FontSize" Value="16" />
+    </Style>
+    <Style x:Key="Button.RowDelete" TargetType="Button" BasedOn="{StaticResource Button.RowAction}">
+        <Setter Property="BorderBrush" Value="{StaticResource Brush.DangerBorder}" />
+        <Setter Property="Foreground" Value="{StaticResource Brush.Danger}" />
+    </Style>
+
+    <!-- Поля вводу координат -->
+    <Style x:Key="Input.Coordinate" TargetType="TextBox">
+        <Setter Property="Height" Value="38" />
+        <Setter Property="FontSize" Value="15" />
+        <Setter Property="Padding" Value="6,0" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="HorizontalContentAlignment" Value="Right" />
+        <Setter Property="BorderBrush" Value="{StaticResource Brush.Border}" />
+        <Setter Property="Margin" Value="3" />
+        <Style.Triggers>
+            <Trigger Property="Validation.HasError" Value="True">
+                <Setter Property="BorderBrush" Value="{StaticResource Brush.Danger}" />
+                <Setter Property="Background" Value="#FEF2F2" />
+            </Trigger>
+            <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=Tag}" Value="Invalid">
+                <Setter Property="BorderBrush" Value="{StaticResource Brush.Danger}" />
+                <Setter Property="BorderThickness" Value="2" />
+                <Setter Property="Background" Value="#FEF2F2" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+    <!-- Таблиця відомості -->
+    <Style x:Key="Worksheet" TargetType="DataGrid">
+        <Setter Property="AutoGenerateColumns" Value="False" />
+        <Setter Property="IsReadOnly" Value="True" />
+        <Setter Property="CanUserAddRows" Value="False" />
+        <Setter Property="CanUserDeleteRows" Value="False" />
+        <Setter Property="CanUserReorderColumns" Value="False" />
+        <Setter Property="CanUserResizeRows" Value="False" />
+        <Setter Property="CanUserSortColumns" Value="False" />
+        <Setter Property="HeadersVisibility" Value="Column" />
+        <Setter Property="GridLinesVisibility" Value="All" />
+        <Setter Property="HorizontalGridLinesBrush" Value="{StaticResource Brush.Border}" />
+        <Setter Property="VerticalGridLinesBrush" Value="{StaticResource Brush.Border}" />
+        <Setter Property="BorderBrush" Value="{StaticResource Brush.Border}" />
+        <Setter Property="Background" Value="White" />
+        <Setter Property="RowBackground" Value="White" />
+        <Setter Property="AlternatingRowBackground" Value="White" />
+        <Setter Property="SelectionMode" Value="Single" />
+        <Setter Property="SelectionUnit" Value="FullRow" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="RowHeight" Value="32" />
+        <Setter Property="ColumnHeaderHeight" Value="56" />
+        <Setter Property="ColumnHeaderStyle">
+            <Setter.Value>
+                <Style TargetType="DataGridColumnHeader">
+                    <Setter Property="Background" Value="{StaticResource Brush.TableHeader}" />
+                    <Setter Property="FontWeight" Value="SemiBold" />
+                    <Setter Property="HorizontalContentAlignment" Value="Center" />
+                    <Setter Property="VerticalContentAlignment" Value="Center" />
+                    <Setter Property="Padding" Value="6,4" />
+                    <Setter Property="BorderBrush" Value="{StaticResource Brush.Border}" />
+                    <Setter Property="BorderThickness" Value="0,0,1,1" />
+                    <Setter Property="ContentTemplate">
+                        <Setter.Value>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding}" TextWrapping="Wrap" TextAlignment="Center" />
+                            </DataTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="CellStyle">
+            <Setter.Value>
+                <Style TargetType="DataGridCell">
+                    <Setter Property="Padding" Value="8,0" />
+                    <Setter Property="BorderThickness" Value="0" />
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="DataGridCell">
+                                <Border Padding="{TemplateBinding Padding}" Background="Transparent">
+                                    <ContentPresenter VerticalAlignment="Center" />
+                                </Border>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                    <Style.Triggers>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="Background" Value="{StaticResource Brush.HintBack}" />
+                            <Setter Property="Foreground" Value="{StaticResource Brush.Text}" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="Cell.Number" TargetType="TextBlock" BasedOn="{StaticResource Text.Base}">
+        <Setter Property="TextAlignment" Value="Right" />
+        <Setter Property="TextWrapping" Value="NoWrap" />
+    </Style>
+    <Style x:Key="Cell.Center" TargetType="TextBlock" BasedOn="{StaticResource Text.Base}">
+        <Setter Property="TextAlignment" Value="Center" />
+        <Setter Property="Foreground" Value="{StaticResource Brush.TextHint}" />
+    </Style>
+
+    <!-- Рядок підсумків під відомістю -->
+    <Style x:Key="SumCell" TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource Brush.TableSum}" />
+        <Setter Property="BorderBrush" Value="{StaticResource Brush.Border}" />
+        <Setter Property="BorderThickness" Value="0,0,1,1" />
+        <Setter Property="Padding" Value="8,6" />
+    </Style>
+    <Style x:Key="SumText" TargetType="TextBlock" BasedOn="{StaticResource Text.Base}">
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="TextAlignment" Value="Right" />
+        <Setter Property="TextWrapping" Value="NoWrap" />
+    </Style>
+
+</ResourceDictionary>

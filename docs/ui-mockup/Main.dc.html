@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<title>GeoArea — обчислення площі ділянки</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0;font-family:"Segoe UI",system-ui,sans-serif;color:#1F2937;background:#E9ECEF}
+a{color:#1D4ED8}a:hover{color:#1E3A8A}
+button{font-family:inherit;cursor:pointer}
+button:hover{filter:brightness(0.95)}
+input{font-family:inherit}
+input:focus{outline:2px solid #1D4ED8;outline-offset:1px}
+table{border-collapse:collapse}
+.ws td,.ws th{border:1px solid #CBD5E1;padding:6px 8px;font-size:14px;text-align:right;white-space:nowrap}
+.ws th{background:#F1F5F9;text-align:center;font-weight:600}
+.ws td.c{text-align:center}
+.ws tr.sum td{background:#F8FAFC;font-weight:700}
+</style>
+</helmet>
+<div style="width: 100%; min-height: 100vh; box-sizing: border-box; display: flex; flex-direction: column; background: #E9ECEF">
+
+  <!-- Заголовок вікна (імітація рамки Windows) -->
+  <div style="display: flex; align-items: center; gap: 10px; padding: 8px 14px; background: #FFFFFF; border-bottom: 1px solid #CBD5E1">
+    <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1D4ED8" stroke-width="2" stroke-linejoin="round"><path d="M4 18 8 5l6 9 3-6 3 10z"></path></svg>
+    <span style="font-size: 14px; font-weight: 600">GeoArea — обчислення площі ділянки за координатами</span>
+    <span style="flex: 1 1 auto"></span>
+    <button title="Відкрити коротку інструкцію з картинками: як ввести координати і де побачити результат" style="display: flex; align-items: center; gap: 6px; padding: 6px 12px; border: 1px solid #CBD5E1; border-radius: 6px; background: #FFFFFF; font-size: 14px; color: #1F2937">
+      <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"></circle><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .9-1 1.7"></path><circle cx="12" cy="17" r=".6" fill="currentColor"></circle></svg>
+      Довідка
+    </button>
+  </div>
+
+  <!-- Панель підказки: завжди видно, що робить елемент під мишею -->
+  <div style="display: flex; align-items: center; gap: 10px; padding: 8px 14px; background: #EFF6FF; border-bottom: 1px solid #BFDBFE; font-size: 14px; color: #1E3A8A">
+    <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5.9 1.1 1 1.9h5c.1-.8.4-1.4 1-1.9A6 6 0 0 0 12 3z"></path></svg>
+    <span><b>Підказка:</b> наведіть мишу на будь-яку кнопку або поле і затримайте на секунду — з'явиться пояснення, що воно робить. Під кожною кнопкою також є короткий опис.</span>
+  </div>
+
+  <div style="display: flex; flex-wrap: wrap; gap: 20px; padding: 20px; box-sizing: border-box; max-width: 1440px; width: 100%; margin: 0 auto">
+
+    <!-- КРОК 1: координати -->
+    <section style="flex: 1 1 460px; min-width: 0; display: flex; flex-direction: column; gap: 14px; padding: 18px; background: #FFFFFF; border: 1px solid #CBD5E1; border-radius: 10px">
+      <div style="display: flex; align-items: center; gap: 10px">
+        <span style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 50%; background: #1D4ED8; color: #FFFFFF; font-weight: 700; font-size: 15px">1</span>
+        <h2 style="margin: 0; font-size: 18px; font-weight: 600">Введіть координати вершин ділянки</h2>
+      </div>
+      <p style="margin: 0; font-size: 14px; color: #4B5563; line-height: 1.45">Для кожної точки (вершини) ділянки введіть координати X та Y у метрах. Точки вводьте по порядку обходу межі — за годинниковою стрілкою або проти, як зручно. Десятковий роздільник — кома або крапка, обидва варіанти підходять.</p>
+
+      <div style="display: flex; flex-wrap: wrap; gap: 10px">
+        <div style="display: flex; flex-direction: column; gap: 4px; flex: 1 1 140px">
+          <button onClick="{{addPoint}}" title="Додає порожній рядок у кінець таблиці, щоб ввести ще одну вершину ділянки" style="display: flex; align-items: center; justify-content: center; gap: 8px; height: 44px; padding: 0 14px; border: 0; border-radius: 6px; background: #1D4ED8; color: #FFFFFF; font-size: 15px; font-weight: 600">
+            <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"></path></svg>
+            Додати точку
+          </button>
+          <span style="font-size: 12px; color: #6B7280; text-align: center">Новий рядок у таблиці</span>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 4px; flex: 1 1 160px">
+          <button onClick="{{togglePaste}}" title="Відкриває поле, куди можна вставити список координат, скопійований з Excel, Word або текстового файлу (Ctrl+V). Програма сама розпізнає числа" style="display: flex; align-items: center; justify-content: center; gap: 8px; height: 44px; padding: 0 14px; border: 1px solid #1D4ED8; border-radius: 6px; background: #FFFFFF; color: #1D4ED8; font-size: 15px; font-weight: 600">
+            <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="4" width="12" height="17" rx="2"></rect><path d="M9 4V3h6v1M9 11h6M9 15h4"></path></svg>
+            Вставити з буфера
+          </button>
+          <span style="font-size: 12px; color: #6B7280; text-align: center">Скопійовані з Excel дані</span>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 4px; flex: 1 1 140px">
+          <button title="Відкриває вікно вибору файлу. Підходять файли .txt та .csv, де в кожному рядку записані X та Y однієї точки" style="display: flex; align-items: center; justify-content: center; gap: 8px; height: 44px; padding: 0 14px; border: 1px solid #1D4ED8; border-radius: 6px; background: #FFFFFF; color: #1D4ED8; font-size: 15px; font-weight: 600">
+            <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
+            Відкрити файл
+          </button>
+          <span style="font-size: 12px; color: #6B7280; text-align: center">Файл .txt або .csv</span>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 4px; flex: 1 1 130px">
+          <button onClick="{{clearAll}}" title="Видаляє всі введені точки, щоб почати нову ділянку з чистої таблиці. Перед видаленням програма перепитає" style="display: flex; align-items: center; justify-content: center; gap: 8px; height: 44px; padding: 0 14px; border: 1px solid #CBD5E1; border-radius: 6px; background: #FFFFFF; color: #374151; font-size: 15px; font-weight: 600">
+            <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"></path></svg>
+            Очистити все
+          </button>
+          <span style="font-size: 12px; color: #6B7280; text-align: center">Почати заново</span>
+        </div>
+      </div>
+
+      <sc-if value="{{pasteOpen}}" hint-placeholder-val="{{ false }}">
+        <div style="display: flex; flex-direction: column; gap: 8px; padding: 12px; background: #F8FAFC; border: 1px dashed #93C5FD; border-radius: 8px">
+          <label for="pasteBox" style="font-size: 14px; font-weight: 600">Вставте сюди скопійовані координати (Ctrl+V)</label>
+          <span style="font-size: 13px; color: #4B5563">Кожна точка — з нового рядка. Між X та Y може бути пробіл, кома, крапка з комою або табуляція. Номер точки на початку рядка — не обов'язковий, програма його пропустить.</span>
+          <textarea id="pasteBox" value="{{pasteText}}" onChange="{{setPasteText}}" placeholder="5432,10   1234,56&#10;5498,75   1301,20&#10;..." style="min-height: 110px; padding: 8px; border: 1px solid #CBD5E1; border-radius: 6px; font-family: Consolas, monospace; font-size: 14px; resize: vertical"></textarea>
+          <div style="display: flex; gap: 10px">
+            <button onClick="{{applyPaste}}" title="Розпізнає числа у вставленому тексті та додає їх у таблицю як нові точки" style="height: 40px; padding: 0 14px; border: 0; border-radius: 6px; background: #15803D; color: #FFFFFF; font-size: 14px; font-weight: 600">Додати ці точки в таблицю</button>
+            <button onClick="{{togglePaste}}" title="Закриває це поле, нічого не додаючи" style="height: 40px; padding: 0 14px; border: 1px solid #CBD5E1; border-radius: 6px; background: #FFFFFF; font-size: 14px">Скасувати</button>
+          </div>
+        </div>
+      </sc-if>
+
+      <div style="overflow-x: auto">
+        <table class="ws" style="width: 100%">
+          <thead>
+            <tr>
+              <th title="Порядковий номер вершини. Порядок має значення — це порядок обходу межі" style="width: 48px">№</th>
+              <th title="Координата X у метрах. Може бути від'ємною — тоді ставте мінус перед числом">X, м</th>
+              <th title="Координата Y у метрах. Може бути від'ємною — тоді ставте мінус перед числом">Y, м</th>
+              <th title="Кнопки для зміни порядку точок та видалення" style="width: 150px">Дії</th>
+            </tr>
+          </thead>
+          <tbody>
+            <sc-for list="{{points}}" as="p" hint-placeholder-count="4">
+              <tr>
+                <td class="c" style="color: #6B7280">{{p.n}}</td>
+                <td style="padding: 3px"><input value="{{p.xs}}" onChange="{{p.setX}}" aria-label="Координата X" title="Введіть координату X цієї точки" style="width: 100%; box-sizing: border-box; height: 38px; padding: 0 8px; border: 1px solid #CBD5E1; border-radius: 4px; font-size: 15px; text-align: right"></td>
+                <td style="padding: 3px"><input value="{{p.ys}}" onChange="{{p.setY}}" aria-label="Координата Y" title="Введіть координату Y цієї точки" style="width: 100%; box-sizing: border-box; height: 38px; padding: 0 8px; border: 1px solid #CBD5E1; border-radius: 4px; font-size: 15px; text-align: right"></td>
+                <td class="c" style="padding: 3px">
+                  <div style="display: flex; gap: 4px; justify-content: center">
+                    <button onClick="{{p.up}}" aria-label="Перемістити точку вище" title="Перемістити цю точку на один рядок вище" style="width: 38px; height: 38px; border: 1px solid #CBD5E1; border-radius: 4px; background: #FFFFFF; color: #374151"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 19V5M5 12l7-7 7 7"></path></svg></button>
+                    <button onClick="{{p.down}}" aria-label="Перемістити точку нижче" title="Перемістити цю точку на один рядок нижче" style="width: 38px; height: 38px; border: 1px solid #CBD5E1; border-radius: 4px; background: #FFFFFF; color: #374151"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M19 12l-7 7-7-7"></path></svg></button>
+                    <button onClick="{{p.remove}}" aria-label="Видалити точку" title="Видалити цю точку з таблиці" style="width: 38px; height: 38px; border: 1px solid #FCA5A5; border-radius: 4px; background: #FFFFFF; color: #B91C1C"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
+                  </div>
+                </td>
+              </tr>
+            </sc-for>
+          </tbody>
+        </table>
+      </div>
+      <span style="font-size: 13px; color: #6B7280">Введено точок: <b>{{count}}</b>. Для розрахунку потрібно щонайменше 3. Площа перераховується автоматично після кожної зміни — окрему кнопку «Порахувати» натискати не треба.</span>
+    </section>
+
+    <!-- КРОК 2: результат -->
+    <section style="flex: 1 1 380px; min-width: 0; display: flex; flex-direction: column; gap: 14px; padding: 18px; background: #FFFFFF; border: 1px solid #CBD5E1; border-radius: 10px">
+      <div style="display: flex; align-items: center; gap: 10px">
+        <span style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 50%; background: #1D4ED8; color: #FFFFFF; font-weight: 700; font-size: 15px">2</span>
+        <h2 style="margin: 0; font-size: 18px; font-weight: 600">Результат</h2>
+      </div>
+
+      <sc-if value="{{ok}}" hint-placeholder-val="{{ true }}">
+        <div style="display: flex; flex-direction: column; gap: 6px; padding: 18px; background: #F0FDF4; border: 1px solid #86EFAC; border-radius: 10px">
+          <span style="font-size: 14px; color: #166534">Площа ділянки</span>
+          <span title="Площа в квадратних метрах, округлена до 0,01 м²" style="font-size: 36px; font-weight: 700; color: #14532D; line-height: 1.1">{{areaM2}} м²</span>
+          <span title="Та сама площа в гектарах (1 га = 10 000 м²), округлена до 0,0001 га" style="font-size: 20px; color: #166534">= {{areaHa}} га</span>
+        </div>
+        <div style="display: flex; align-items: flex-start; gap: 10px; padding: 12px; background: #F0FDF4; border-radius: 8px; font-size: 14px; color: #166534" title="Перевірка правильності: сума стовпця 8 має збігатися із сумою стовпця 9, а суми стовпців 6 і 7 мають дорівнювати нулю">
+          <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#15803D" stroke-width="2.5"><circle cx="12" cy="12" r="9"></circle><path d="m8 12 3 3 5-6"></path></svg>
+          <span><b>Контроль пройдено.</b> Обидва способи підрахунку дали однаковий результат — обчислення правильне.</span>
+        </div>
+      </sc-if>
+      <sc-if value="{{notOk}}" hint-placeholder-val="{{ false }}">
+        <div style="display: flex; align-items: flex-start; gap: 10px; padding: 14px; background: #FFF7ED; border: 1px solid #FDBA74; border-radius: 10px; font-size: 14px; color: #9A3412">
+          <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C2410C" stroke-width="2.5"><path d="M12 3 2 21h20zM12 9v5M12 17.5v.5"></path></svg>
+          <span><b>Поки що немає результату.</b> {{message}}</span>
+        </div>
+      </sc-if>
+
+      <div style="display: flex; flex-direction: column; gap: 8px; font-size: 14px; color: #4B5563; line-height: 1.45">
+        <b style="color: #1F2937">Як це рахується</b>
+        <span>Програма використовує формулу Гаусса: координати кожної точки множаться на різницю координат сусідніх точок, усе додається і ділиться на 2. Рахунок ведеться двома способами одночасно (стовпці 8 і 9 відомості) — якщо вони збігаються, помилки немає.</span>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 8px; padding-top: 6px; border-top: 1px solid #E5E7EB">
+        <b style="font-size: 14px">Налаштування</b>
+        <label style="display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 14px" title="Скільки знаків після коми показувати в обчислених стовпцях відомості">
+          <span>Знаків після коми у відомості</span>
+          <select style="height: 36px; padding: 0 8px; border: 1px solid #CBD5E1; border-radius: 4px; font-size: 14px"><option>2</option><option>3</option><option>4</option></select>
+        </label>
+        <label style="display: flex; align-items: center; gap: 10px; font-size: 14px" title="Якщо остання точка збігається з першою (контур «замкнули» вручну), програма не рахуватиме її двічі">
+          <input type="checkbox" checked="{{ true }}" style="width: 20px; height: 20px">
+          <span>Не враховувати повторно першу точку в кінці списку</span>
+        </label>
+      </div>
+    </section>
+
+    <!-- КРОК 3: відомість -->
+    <section style="flex: 1 1 100%; min-width: 0; display: flex; flex-direction: column; gap: 14px; padding: 18px; background: #FFFFFF; border: 1px solid #CBD5E1; border-radius: 10px">
+      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px">
+        <span style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 50%; background: #1D4ED8; color: #FFFFFF; font-weight: 700; font-size: 15px">3</span>
+        <h2 style="margin: 0; font-size: 18px; font-weight: 600">Відомість обчислення площі по координатам точок вершин</h2>
+        <span style="flex: 1 1 auto"></span>
+        <div style="display: flex; flex-wrap: wrap; gap: 10px">
+          <div style="display: flex; flex-direction: column; gap: 4px">
+            <button title="Копіює всю таблицю відомості в буфер обміну. Потім її можна вставити у Word або Excel через Ctrl+V" style="display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 14px; border: 1px solid #1D4ED8; border-radius: 6px; background: #FFFFFF; color: #1D4ED8; font-size: 15px; font-weight: 600">
+              <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="11" height="11" rx="2"></rect><path d="M5 15V5h10"></path></svg>
+              Копіювати таблицю
+            </button>
+            <span style="font-size: 12px; color: #6B7280; text-align: center">Для вставки у Word / Excel</span>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 4px">
+            <button title="Зберігає заповнену відомість як файл Word (.docx) у вигляді, як у бланку" style="display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 14px; border: 1px solid #1D4ED8; border-radius: 6px; background: #FFFFFF; color: #1D4ED8; font-size: 15px; font-weight: 600">
+              <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3h8l4 4v14H6zM14 3v4h4M9 13h6M9 17h6"></path></svg>
+              Зберегти у Word
+            </button>
+            <span style="font-size: 12px; color: #6B7280; text-align: center">Файл .docx на диску</span>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 4px">
+            <button title="Відкриває стандартне вікно друку Windows і друкує відомість на принтері" style="display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 14px; border: 1px solid #1D4ED8; border-radius: 6px; background: #FFFFFF; color: #1D4ED8; font-size: 15px; font-weight: 600">
+              <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 8V3h10v5M5 8h14a2 2 0 0 1 2 2v6h-4v4H7v-4H3v-6a2 2 0 0 1 2-2z"></path></svg>
+              Друкувати
+            </button>
+            <span style="font-size: 12px; color: #6B7280; text-align: center">На принтер</span>
+          </div>
+        </div>
+      </div>
+      <p style="margin: 0; font-size: 14px; color: #4B5563; line-height: 1.45">Ця таблиця заповнюється автоматично і повторює стандартний бланк. Стовпці 6–9 — проміжні обчислення; у рядку «Сума» видно, що суми стовпців 8 і 9 збігаються, а стовпців 6 і 7 — дорівнюють нулю. Це і є перевірка правильності.</p>
+
+      <div style="overflow-x: auto">
+        <table class="ws" style="width: 100%; min-width: 900px">
+          <thead>
+            <tr>
+              <th rowspan="2" title="Номер вершини">№ п/п</th>
+              <th colspan="2" title="Введені координати точки">Координати</th>
+              <th colspan="2" title="Різниця координат сусідніх точок: попередньої (n−1) та наступної (n+1)">Різниця координат</th>
+              <th colspan="2" title="Добуток різниці на координату поточної точки. Суми цих двох стовпців мають збігатися">Добуток</th>
+            </tr>
+            <tr>
+              <th>X</th>
+              <th>Y</th>
+              <th title="X попередньої точки мінус X наступної">X<sub>n−1</sub> − X<sub>n+1</sub></th>
+              <th title="Y наступної точки мінус Y попередньої">Y<sub>n+1</sub> − Y<sub>n−1</sub></th>
+              <th title="Стовпець 6 помножений на Y цієї точки">(X<sub>n−1</sub> − X<sub>n+1</sub>)·Y<sub>n</sub></th>
+              <th title="Стовпець 7 помножений на X цієї точки">(Y<sub>n+1</sub> − Y<sub>n−1</sub>)·X<sub>n</sub></th>
+            </tr>
+            <tr style="color: #6B7280; font-size: 12px">
+              <th>1</th><th>3</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th>
+            </tr>
+          </thead>
+          <tbody>
+            <sc-for list="{{rows}}" as="r" hint-placeholder-count="4">
+              <tr>
+                <td class="c">{{r.n}}</td>
+                <td>{{r.x}}</td>
+                <td>{{r.y}}</td>
+                <td>{{r.dx}}</td>
+                <td>{{r.dy}}</td>
+                <td>{{r.p8}}</td>
+                <td>{{r.p9}}</td>
+              </tr>
+            </sc-for>
+            <tr class="sum">
+              <td class="c" colspan="3">Сума</td>
+              <td title="Має дорівнювати нулю">{{sumDx}}</td>
+              <td title="Має дорівнювати нулю">{{sumDy}}</td>
+              <td title="Подвоєна площа 2P за першим способом">{{sum8}}</td>
+              <td title="Подвоєна площа 2P за другим способом — має збігатися зі стовпцем 8">{{sum9}}</td>
+            </tr>
+            <tr class="sum">
+              <td class="c" colspan="3">Подвоєна площа 2P, м²</td>
+              <td colspan="4" style="text-align: center">{{twoP}}</td>
+            </tr>
+            <tr class="sum">
+              <td class="c" colspan="3">Площа P = 2P / 2</td>
+              <td colspan="4" style="text-align: center; color: #14532D">{{areaM2}} м² = {{areaHa}} га</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <!-- Рядок стану -->
+  <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 16px; padding: 8px 14px; margin-top: auto; background: #FFFFFF; border-top: 1px solid #CBD5E1; font-size: 13px; color: #4B5563">
+    <span>{{status}}</span>
+    <span style="flex: 1 1 auto"></span>
+    <span>GeoArea 1.0</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1320}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = {
+      pts: [
+        { xs: '5432,10', ys: '1234,56' },
+        { xs: '5498,75', ys: '1301,20' },
+        { xs: '5456,30', ys: '1389,45' },
+        { xs: '5390,85', ys: '1322,80' }
+      ],
+      pasteOpen: false,
+      pasteText: ''
+    };
+  }
+  num(s) {
+    if (s === undefined || s === null) return NaN;
+    const t = String(s).trim().replace(/\s+/g, '').replace(',', '.');
+    return t === '' ? NaN : Number(t);
+  }
+  fmt(v, d) {
+    if (!isFinite(v)) return '—';
+    const r = Math.abs(v) < 0.5 * Math.pow(10, -d) ? 0 : v;
+    return r.toLocaleString('uk-UA', { minimumFractionDigits: d, maximumFractionDigits: d });
+  }
+  update(i, key, val) {
+    const pts = this.state.pts.map((p, k) => (k === i ? Object.assign({}, p, { [key]: val }) : p));
+    this.setState({ pts });
+  }
+  move(i, dir) {
+    const pts = this.state.pts.slice();
+    const j = i + dir;
+    if (j < 0 || j >= pts.length) return;
+    const t = pts[i]; pts[i] = pts[j]; pts[j] = t;
+    this.setState({ pts });
+  }
+  renderVals() {
+    const pts = this.state.pts;
+    const points = pts.map((p, i) => ({
+      n: i + 1,
+      xs: p.xs,
+      ys: p.ys,
+      setX: (e) => this.update(i, 'xs', e.target.value),
+      setY: (e) => this.update(i, 'ys', e.target.value),
+      up: () => this.move(i, -1),
+      down: () => this.move(i, 1),
+      remove: () => this.setState({ pts: pts.filter((_, k) => k !== i) })
+    }));
+
+    const nums = pts.map((p) => ({ x: this.num(p.xs), y: this.num(p.ys) }));
+    const valid = nums.filter((p) => isFinite(p.x) && isFinite(p.y));
+    const n = valid.length;
+    let rows = [], sumDx = 0, sumDy = 0, sum8 = 0, sum9 = 0;
+    const ok = n >= 3 && n === nums.length;
+    if (ok) {
+      rows = valid.map((p, i) => {
+        const prev = valid[(i - 1 + n) % n], next = valid[(i + 1) % n];
+        const dx = prev.x - next.x, dy = next.y - prev.y;
+        const p8 = dx * p.y, p9 = dy * p.x;
+        sumDx += dx; sumDy += dy; sum8 += p8; sum9 += p9;
+        return { n: i + 1, x: this.fmt(p.x, 2), y: this.fmt(p.y, 2), dx: this.fmt(dx, 2), dy: this.fmt(dy, 2), p8: this.fmt(p8, 2), p9: this.fmt(p9, 2) };
+      });
+    }
+    const twoP = Math.abs(sum8);
+    const area = twoP / 2;
+    let message = '';
+    if (nums.length < 3) message = 'Додайте щонайменше 3 точки — лише тоді можна порахувати площу.';
+    else if (n < nums.length) message = 'У деяких рядках координати порожні або введені з помилкою. Перевірте, чи в кожному полі стоїть число.';
+
+    return {
+      points,
+      count: pts.length,
+      ok,
+      notOk: !ok,
+      message,
+      rows,
+      sumDx: this.fmt(sumDx, 2),
+      sumDy: this.fmt(sumDy, 2),
+      sum8: this.fmt(sum8, 2),
+      sum9: this.fmt(sum9, 2),
+      twoP: this.fmt(twoP, 2),
+      areaM2: ok ? this.fmt(area, 2) : '—',
+      areaHa: ok ? this.fmt(area / 10000, 4) : '—',
+      status: ok ? 'Готово. Введено точок: ' + pts.length + '. Площу обчислено, контроль пройдено.' : 'Очікую введення координат.',
+      pasteOpen: this.state.pasteOpen,
+      pasteText: this.state.pasteText,
+      togglePaste: () => this.setState({ pasteOpen: !this.state.pasteOpen, pasteText: '' }),
+      setPasteText: (e) => this.setState({ pasteText: e.target.value }),
+      applyPaste: () => {
+        const added = [];
+        this.state.pasteText.split(/\r?\n/).forEach((line) => {
+          const toks = line.match(/-?\d+(?:[.,]\d+)?/g);
+          if (!toks || toks.length < 2) return;
+          const pair = toks.length >= 3 ? toks.slice(-2) : toks;
+          added.push({ xs: pair[0], ys: pair[1] });
+        });
+        this.setState({ pts: pts.concat(added), pasteOpen: false, pasteText: '' });
+      },
+      addPoint: () => this.setState({ pts: pts.concat([{ xs: '', ys: '' }]) }),
+      clearAll: () => this.setState({ pts: [] })
+    };
+  }
+}
+</script>
+</body>
+</html>
